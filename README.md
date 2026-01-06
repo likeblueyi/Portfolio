@@ -1,68 +1,39 @@
-# SCHEDULING (ENERGY) and Its End-to-End Combinatorial Optimization Strategy
+# Portfolio and Its End-to-End Combinatorial Optimization Strategy
+## Preface
+Given the large number of formulas in this project, we recommend reading this README.md in a local Markdown editor to prevent display issues on platforms like GitHub. Next, we will introduce how to run the project's source code:
+(i) Unzip the compressed package `main.zip`;
+(ii) Directly run the file at the path `\rethink_exp\test programing.py`;
+(iii)Select the baseline method as prompted to complete the model training, validation and testing operations.
+
+
 ## Problem Introduction
-**Problem Background:**  
-With the increasing penetration of clean energy sources into the power grid, energy demand profiles and pricing mechanisms have exhibited enhanced adaptability. Within the realm of industrial production, the optimization of scheduling tasks with respect to real-time energy prices holds significant potential for substantial energy conservation and operational cost reduction. This study focuses on formulating and solving an energy-cost-aware scheduling problem, which encompasses both predictive and optimization components.
 
-**Prediction Phase:**  
-The predictive task entails forecasting the energy price for each of the 48 time slots (each slot corresponding to a 30-minute interval) within a given scheduling horizon. To achieve this, a set of relevant features is utilized, including, but not limited to, weather predictions (such as temperature forecasts), wind energy production estimates, and other operational parameters (e.g., production load forecasts). Mathematically, for a time slot index \(t\), let \(\mathbf{x}_t\) denote the feature vector comprising these relevant attributes, and the goal is to predict the energy price \(p_t\), as below.
+**Problem Background:** Asset allocation stands as a pivotal mechanism in facilitating the circulation of capital across diverse sectors of the economy, thereby playing a crucial role in enhancing overall economic efficiency. In the realm of financial portfolio management, the optimization of asset distribution aims to strike a balance between maximizing returns and mitigating risks, a challenge that has garnered significant attention in both academic research and practical applications.
+
+**Prediction Phase:** The predictive task involves leveraging historical features, such as daily price series and trading volume data, to forecast the daily return \( y \) for a set of \( N \) stocks. Mathematically, let \( \mathbf{x}_i \) denote the feature vector associated with stock \( i \), which may include, but is not limited to, 10-day, weekly, monthly, and annual historical returns, as well as rolling averages over these time windows. The goal is to predict the return \( \hat{y}_i \) for stock \( i \) on the subsequent trading day, as below.
 $$
-\hat{p}_t = \mathcal{M}(\mathbf{x}_t)
-$$
-
-**Decision Phase:**  
-The optimization objective is to minimize the total energy cost associated with scheduling \(J\) jobs on \(M\) machines, while adhering to the constraints of earliest start time \(e_j\) and latest end time \(l_j\) for each job \(j\).
-
-We define the following parameters:
-- \(M\): Number of machines available for job processing.
-- \(J\): Number of jobs to be scheduled.
-- \(R\): Number of resources required for job execution.
-- \(T\): Number of time slots in a scheduling day (set to \(T = 48\) in this study, corresponding to 30-minute intervals).
-- \(e_j\): Earliest start time of job \(j\).
-- \(l_j\): Latest end time of job \(j\).
-- \(d_j\): Duration of job \(j\).
-- \(p_j^t\): Power usage of job \(j\) at time slot \(t\).
-- \(u_{jr}\): Resource usage of job \(j\) on resource \(r\).
-- \(c_{mr}\): Capacity of machine \(m\) for resource \(r\).
-
-Let \(v^{jmt}\) be a binary decision variable, where \(v^{jmt}=1\) if job \(j\) starts at time slot \(t\) on machine \(m\), and \(v^{jmt} = 0\) otherwise. The objective function aims to minimize the total energy cost of the schedule, which is formulated as a linear program as below.
-$$
-\min_{\mathbf{v}} \sum_{j \in J} \sum_{m \in M} \sum_{t \in T} v^{jmt} \left( \sum_{t'=t}^{t + d_j - 1} p_j^{t'} \right)
+\hat{y}_i = \mathcal{M}_\theta(\mathbf{x}_i)
 $$
 
-subject to the following constraints:
+**Decision Phase:** The optimization objective is to maximize the expected portfolio return while simultaneously minimizing the associated risk. We define the following variables and parameters:
+- \( \mathbf{v} \in \mathbb{R}^N \): A vector where \( v^i \) represents the fraction of capital invested in stock \( i \), with \( 0\leq v^i\leq 1 \) and \( \sum_{i = 1}^{N} v^i = 1 \).
+- \( \mathbf{y} \in \mathbb{R}^N \): A vector of expected returns for each stock, where \( y^i \) is the predicted return for stock \( i \).
+- \( \lambda = 0.1 \): A risk-aversion parameter that quantifies the trade-off between return and risk.
+- \( \mathbf{Q} \in \mathbb{R}^{N\times N} \): A positive semi-definite matrix that characterizes the covariance structure between the returns of different stocks.
 
-1. **Job Scheduling Uniqueness Constraint**: Each job is scheduled on exactly one machine at a unique start time, as shown below.
+The optimization problem is formulated as below.
 $$
-\sum_{m \in M} \sum_{t \in T} v^{jmt}=1, \quad \forall j \in J \notin \mathcal{T}_{jm}
+\mathbf{v}^*(\mathbf{y})=\arg\max_{\mathbf{v}} \mathbf{v}^\top\mathbf{y}-\lambda\mathbf{v}^\top\mathbf{Q}\mathbf{v}
 $$
-
-2. **Machine-Job Compatibility Constraint**: A job cannot be scheduled on a machine outside the set of available machines for that job, as shown below.
 $$
-v^{jmt}=0, \quad \forall j \in J, \forall m \in M, \forall t \notin \mathcal{T}_{jm}
-$$
-where \(\mathcal{T}_{jm}\) represents the set of valid start times for job \(j\) on machine \(m\).
-
-3. **Time Window Constraint**: The job must start after the earliest start time and end before the latest end time, as shown below.
-$$
-v^{jmt}=0, \quad \forall j \in J, \forall m \in M, \forall t + d_j>l_j
+\text{subject to: }\sum_{i = 0}^{N} v^i = 1
 $$
 
-4. **Resource Capacity Constraint**: The resource usage of all jobs scheduled on a machine must not exceed the machine's resource capacity, as shown below.
-$$
-\sum_{j \in J} \sum_{t'=t - d_j + 1}^{t} v^{jmt} u_{jr} \leq c_{mr}, \quad \forall m \in M, \forall r \in R, \forall t \in T
-$$
+Here, the first term \( \mathbf{v}^\top\mathbf{y} \) represents the expected return of the portfolio, and the second term \( \lambda\mathbf{v}^\top\mathbf{Q}\mathbf{v} \) accounts for the portfolio risk, where the covariance matrix \( \mathbf{Q} \) captures the interdependencies between stock returns.
 
-In our experimental setup, we adopt \(N = 3\) machines, \(R = 1\) resource, and the resource usage \(u_{jr}\) is assumed to be known and constant.
+**Dataset and License:** The dataset employed in this study is sourced from the publicly available SP500 dataset: Quandl (2022), which contains financial data of 505 of the largest companies in the US market spanning from 2004 to 2017. The feature set for each stock includes historical returns over multiple time horizons (10-day, weekly, monthly, and annual) and rolling averages computed over these periods. In our experimental setup, we set the risk-aversion parameter \( \lambda = 0.1 \).
 
-**Dataset and License:**  
-The dataset utilized in this study is sourced from the open-sourced Irish Single Electricity Market Operator (SEMO) dataset. This dataset contains energy-related data collected from midnight 1st November 2011 to 31st December 2013. The energy price prediction task at each time slot is based on a 9-dimensional feature vector, which includes:
-- Calendar attributes (e.g., day of the week, month).
-- Day-ahead weather characteristic estimates (such as wind speed, temperature forecasts).
-- SEMO day-ahead forecasted energy load.
-- Wind energy production and price forecasts.
-- Actual measurements (including wind speed, temperature, \(\text{CO}_2\) intensity, and real-time price).
-
-The publicly available SEMO dataset  adopted in this research is licensed and regulated by the Commission for Regulation of Utilities (CRU) in Ireland and the Utility Regulator for Northern Ireland (URENI, formerly known as NIAUR). Researchers utilizing this dataset must adhere to the licensing terms and regulatory requirements set forth by these authorities.
+The publicly accessible dataset utilized in this research is obtained from the specified website. Users must adhere to the terms and conditions outlined in the corresponding data usage agreement for its legitimate utilization.
 
 ## Baseline Comparison Methods Introduction
 **SPO**
@@ -131,16 +102,17 @@ $regret (\mathbf{c},\hat{\mathbf{c}})=||f(\mathbf{z}^*(\mathbf{c}); \mathbf{c})-
 $
 
 #### Results on the test set:
-| Methods         | Relative Regret on Scheduling (Energy) |
-|-----------------|---------------------|
-| 2-stage         | 1.793               |
-| DFL             | 6.272               |
-| Blackbox        | 6.503               |
-| Identity        | 5.690               |
-| CPLayer         | --                  |
-| SPO             | $\textbf{\underline{1.505}}$ |
-| LODL            | 1.786               |
-| NCE             | 1.663               |
-| Org-LTR         | 1.540               |
-| SAA-LTR (ours)  | 2.339               |
+| Methods         | Relative Regret on  Portfolio |
+|-----------------|-----------|
+| 2-stage         | 0.243     |
+| DFL             | 0.380     |
+| Blackbox        | 0.286     |
+| Identity        | 0.280     |
+| CPLayer         | 0.309     |
+| SPO             | 0.245     |
+| LODL            | **0.160** |
+| NCE             | 0.367     |
+| Org-LTR         | 0.214     |
+| SAA-LTR (ours)  | 0.333     |
+
 
