@@ -14,7 +14,7 @@ Given the large number of formulas in this project, we recommend reading this RE
 $\hat{y}_i = \mathcal{M}_\theta (\mathbf{x}_i)$
 
 **Decision Phase:** The optimization objective is to maximize the expected portfolio return while simultaneously minimizing the associated risk. We define the following variables and parameters:
-- $\mathbf{v} \in \mathbb{R}^N$: A vector where $v^i$ represents the fraction of capital invested in stock $i$, with $0\leq v^i\leq 1 $ and $\sum_{i = 1}^{N} v^i = 1$.
+- $\mathbf{v} \in \mathbb{R}^N$: A vector where $v^i$ represents the fraction of capital invested in stock $i$, with $0\leq v^i\leq 1$ and $\sum_{i = 1}^{N} v^i = 1$.
 - $\mathbf{y} \in \mathbb{R}^N$: A vector of expected returns for each stock, where $y^i$ is the predicted return for stock $i$.
 - $\lambda = 0.1$: A risk-aversion parameter that quantifies the trade-off between return and risk.
 - $\mathbf{Q} \in \mathbb{R}^{N\times N}$: A positive semi-definite matrix that characterizes the covariance structure between the returns of different stocks.
