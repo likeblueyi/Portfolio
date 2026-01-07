@@ -10,28 +10,22 @@ Given the large number of formulas in this project, we recommend reading this RE
 
 **Problem Background:** Asset allocation stands as a pivotal mechanism in facilitating the circulation of capital across diverse sectors of the economy, thereby playing a crucial role in enhancing overall economic efficiency. In the realm of financial portfolio management, the optimization of asset distribution aims to strike a balance between maximizing returns and mitigating risks, a challenge that has garnered significant attention in both academic research and practical applications.
 
-**Prediction Phase:** The predictive task involves leveraging historical features, such as daily price series and trading volume data, to forecast the daily return $ y $ for a set of $ N $ stocks. Mathematically, let $ \mathbf{x}_i $ denote the feature vector associated with stock $ i $, which may include, but is not limited to, 10-day, weekly, monthly, and annual historical returns, as well as rolling averages over these time windows. The goal is to predict the return $ \hat{y}_i $ for stock $ i $ on the subsequent trading day, as below.
-$
-\hat{y}_i = \mathcal{M}_\theta(\mathbf{x}_i)
-$
+**Prediction Phase:** The predictive task involves leveraging historical features, such as daily price series and trading volume data, to forecast the daily return $y$ for a set of $N$ stocks. Mathematically, let $\mathbf{x}_i$ denote the feature vector associated with stock $i$, which may include, but is not limited to, 10-day, weekly, monthly, and annual historical returns, as well as rolling averages over these time windows. The goal is to predict the return $\hat{y}_i$ for stock $i$ on the subsequent trading day, as below.
+$\hat{y}_i = \mathcal{M}_\theta (\mathbf{x}_i)$
 
 **Decision Phase:** The optimization objective is to maximize the expected portfolio return while simultaneously minimizing the associated risk. We define the following variables and parameters:
-- $ \mathbf{v} \in \mathbb{R}^N $: A vector where $ v^i $ represents the fraction of capital invested in stock $ i $, with $ 0\leq v^i\leq 1 $ and $ \sum_{i = 1}^{N} v^i = 1 $.
-- $ \mathbf{y} \in \mathbb{R}^N $: A vector of expected returns for each stock, where $ y^i $ is the predicted return for stock $ i $.
-- $ \lambda = 0.1 $: A risk-aversion parameter that quantifies the trade-off between return and risk.
-- $ \mathbf{Q} \in \mathbb{R}^{N\times N} $: A positive semi-definite matrix that characterizes the covariance structure between the returns of different stocks.
+- $\mathbf{v} \in \mathbb{R}^N$: A vector where $v^i$ represents the fraction of capital invested in stock $i$, with $0\leq v^i\leq 1 $ and $\sum_{i = 1}^{N} v^i = 1$.
+- $\mathbf{y} \in \mathbb{R}^N$: A vector of expected returns for each stock, where $y^i$ is the predicted return for stock $i$.
+- $\lambda = 0.1$: A risk-aversion parameter that quantifies the trade-off between return and risk.
+- $\mathbf{Q} \in \mathbb{R}^{N\times N}$: A positive semi-definite matrix that characterizes the covariance structure between the returns of different stocks.
 
 The optimization problem is formulated as below.
-$
-\mathbf{v}^*(\mathbf{y})=\arg\max_{\mathbf{v}} \mathbf{v}^\top\mathbf{y}-\lambda\mathbf{v}^\top\mathbf{Q}\mathbf{v}
-$
-$
-\text{subject to: }\sum_{i = 0}^{N} v^i = 1
-$
+$\mathbf{v}^*(\mathbf{y})=\arg\max_{\mathbf{v}} \mathbf{v}^\top\mathbf{y}-\lambda\mathbf{v}^\top\mathbf{Q}\mathbf{v}$
+$\text{subject to: }\sum_{i = 0}^{N} v^i = 1$
 
-Here, the first term $ \mathbf{v}^\top\mathbf{y} $ represents the expected return of the portfolio, and the second term $ \lambda\mathbf{v}^\top\mathbf{Q}\mathbf{v} $ accounts for the portfolio risk, where the covariance matrix $ \mathbf{Q} $ captures the interdependencies between stock returns.
+Here, the first term $\mathbf{v}^\top\mathbf{y}$ represents the expected return of the portfolio, and the second term $\lambda\mathbf{v}^\top\mathbf{Q}\mathbf{v}$ accounts for the portfolio risk, where the covariance matrix $\mathbf{Q}$ captures the interdependencies between stock returns.
 
-**Dataset and License:** The dataset employed in this study is sourced from the publicly available SP500 dataset: Quandl (2022), which contains financial data of 505 of the largest companies in the US market spanning from 2004 to 2017. The feature set for each stock includes historical returns over multiple time horizons (10-day, weekly, monthly, and annual) and rolling averages computed over these periods. In our experimental setup, we set the risk-aversion parameter $ \lambda = 0.1 $.
+**Dataset and License:** The dataset employed in this study is sourced from the publicly available SP500 dataset: Quandl (2022), which contains financial data of 505 of the largest companies in the US market spanning from 2004 to 2017. The feature set for each stock includes historical returns over multiple time horizons (10-day, weekly, monthly, and annual) and rolling averages computed over these periods. In our experimental setup, we set the risk-aversion parameter $\lambda = 0.1$.
 
 The publicly accessible dataset utilized in this research is obtained from the specified website. Users must adhere to the terms and conditions outlined in the corresponding data usage agreement for its legitimate utilization.
 
@@ -51,7 +45,7 @@ $
 \mathcal{L}_{\text{NCE}}(\hat{c}, c)=\frac{1}{|\mathbb{S}|}\sum_{\mathbf{v} \in \mathbb{S}}\left(f(\mathbf{v}^*(c), \hat{\mathbf{c}}) - f(\mathbf{v}, \hat{\mathbf{c}})\right)
 $
 
-The novelty lies in the above formula being differentiable without solving the optimization problem. Moreover, if solutions in $ \mathbb{S}$ are optimal for arbitrary cost vectors, this approach is equivalent to training within a region of the convex hull of $ \mathbb{V} $.
+The novelty lies in the above formula being differentiable without solving the optimization problem. Moreover, if solutions in $ \mathbb{S}$ are optimal for arbitrary cost vectors, this approach is equivalent to training within a region of the convex hull of $\mathbb{V}$.
 
 **CpLayer**
 Agrawal et al. (2019)  propose an approach to differentiate through disciplined convex programs (a subset of convex optimization problems used in domain-specific languages). Introducing disciplined parametrized programming (a subset of disciplined convex programming), they show every such program can be represented as composing an affine map from parameters to problem data, a solver, and an affine map from solver solution to original problem solution.
